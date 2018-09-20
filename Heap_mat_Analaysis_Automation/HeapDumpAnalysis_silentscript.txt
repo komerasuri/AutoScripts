@@ -1,0 +1,31 @@
+. /home/was7adm/.bash_profile_MAT
+#/opt/IBM/MAT/mat/MemoryAnalyzer
+#!/bin/bash
+
+#echo "Please enter the heap dump file absolute path"
+#read path
+#path=/home/was6adm/Haep_Dump/t.phd
+
+#mat_silent.sh <absolete path of dump> <mailid>
+
+
+./ParseHeapDump.sh $1 org.eclipse.mat.api:suspects
+./ParseHeapDump.sh $1 org.eclipse.mat.api:overview
+./ParseHeapDump.sh $1 org.eclipse.mat.api:top_components
+
+echo "Reports have been generated at the heap dump location"
+
+path=$(echo $1 | awk -F'/' '{for (i=1; i<NF; i++) printf("%s/", $i)}')
+
+
+cp $path/*.zip /home/was7adm/output
+
+tar -cvf /home/was7adm/output_$3.tar /home/was7adm/output
+
+echo "Dump_Analysis - $3" | mailx -s "Dump Analysis" -a ~/output_$3.tar $2
+
+sleep 100
+
+rm -rf ~/output/*
+
+rm -rf $path/*.zip
